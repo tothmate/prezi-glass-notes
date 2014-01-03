@@ -1,7 +1,14 @@
 package com.prezi.notes;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.content.Context;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
@@ -15,7 +22,7 @@ public class NoteView extends FrameLayout {
     }
 
     // About 24 FPS.
-    private static final long DELAY_MILLIS = 41;
+    private static final long DELAY_MILLIS = 300;
 
     private final TextView mNoteTextView;
 
@@ -28,6 +35,8 @@ public class NoteView extends FrameLayout {
 
     public NoteView(Context context) {
         this(context, null, 0);
+    	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+    	StrictMode.setThreadPolicy(policy); 
     }
 
     public NoteView(Context context, AttributeSet attrs) {
@@ -98,8 +107,24 @@ public class NoteView extends FrameLayout {
         }
     }
 
+    private String[] notes = {"hello", "cica", "maki", "masik maki"}; 
+    
+    private String getPathStep() {
+    	String response = "para";
+    	try {
+	    	HttpClient client = new DefaultHttpClient();
+	    	HttpGet httpget = new HttpGet("http://oam2.us.prezi.com/~tothmate/step");
+	        ResponseHandler<String> responseHandler = new BasicResponseHandler();
+	        response = client.execute(httpget, responseHandler);
+	        response = notes[Integer.parseInt(response)];
+    	} catch (Exception e) {
+    		response = e.toString();
+    	}
+        return response;
+    }
+    
     private void updateText() {
-       mNoteTextView.setText("hello cicus");
+       mNoteTextView.setText(getPathStep());
         if (mChangeListener != null) {
             mChangeListener.onChange();
         }
