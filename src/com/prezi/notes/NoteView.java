@@ -8,7 +8,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
@@ -21,7 +23,6 @@ public class NoteView extends FrameLayout {
         public void onChange();
     }
 
-    // About 24 FPS.
     private static final long DELAY_MILLIS = 300;
 
     private final TextView mNoteTextView;
@@ -48,6 +49,11 @@ public class NoteView extends FrameLayout {
         LayoutInflater.from(context).inflate(R.layout.card_notes, this);
 
         mNoteTextView = (TextView) findViewById(R.id.noteText);
+        
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "prezinotes").acquire();
+        pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "prezinotes").acquire();
+        pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "prezinotes").acquire();
     }
 
     public void setListener(ChangeListener listener) {
@@ -107,8 +113,6 @@ public class NoteView extends FrameLayout {
         }
     }
 
-    private String[] notes = {"hello", "cica", "maki", "masik maki"}; 
-    
     private String getPathStep() {
     	String response = "para";
     	try {
@@ -116,15 +120,14 @@ public class NoteView extends FrameLayout {
 	    	HttpGet httpget = new HttpGet("http://oam2.us.prezi.com/~tothmate/step");
 	        ResponseHandler<String> responseHandler = new BasicResponseHandler();
 	        response = client.execute(httpget, responseHandler);
-	        response = notes[Integer.parseInt(response)];
     	} catch (Exception e) {
-    		response = e.toString();
+    		response = e.getMessage();
     	}
-        return response;
+        return "Unable to";
     }
     
     private void updateText() {
-       mNoteTextView.setText(getPathStep());
+        mNoteTextView.setText(getPathStep());
         if (mChangeListener != null) {
             mChangeListener.onChange();
         }
