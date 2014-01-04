@@ -1,20 +1,15 @@
 package com.prezi.notes;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.StrictMode;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.TextView;	
 
 import com.prezi.notes.R;
 
@@ -34,10 +29,11 @@ public class NoteView extends FrameLayout {
 
     private ChangeListener mChangeListener;
 
+    private UpdateStepTask updateStepTask = new UpdateStepTask(this); 
+    public String currentNote = "no path step yet";
+    
     public NoteView(Context context) {
-        this(context, null, 0);
-    	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-    	StrictMode.setThreadPolicy(policy); 
+        this(context, null, 0); 
     }
 
     public NoteView(Context context, AttributeSet attrs) {
@@ -54,6 +50,8 @@ public class NoteView extends FrameLayout {
         pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "prezinotes").acquire();
         pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "prezinotes").acquire();
         pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "prezinotes").acquire();
+        
+        updateStepTask.execute();
     }
 
     public void setListener(ChangeListener listener) {
@@ -112,24 +110,20 @@ public class NoteView extends FrameLayout {
             mRunning = running;
         }
     }
-
-    private String getPathStep() {
-    	String response = "para";
-    	try {
-	    	HttpClient client = new DefaultHttpClient();
-	    	HttpGet httpget = new HttpGet("http://oam2.us.prezi.com/~tothmate/step");
-	        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-	        response = client.execute(httpget, responseHandler);
-    	} catch (Exception e) {
-    		response = e.getMessage();
-    	}
-        return "Unable to";
-    }
     
     private void updateText() {
-        mNoteTextView.setText(getPathStep());
+        mNoteTextView.setText(currentNote);
         if (mChangeListener != null) {
             mChangeListener.onChange();
         }
+    }
+    
+    private DownloadImageTask downloadImageTask;
+    public void setBackground(String url) {
+    	if (downloadImageTask != null) {
+    		downloadImageTask.cancel(true);
+    	}
+    	downloadImageTask = new DownloadImageTask((ImageView) findViewById(R.id.thumbImg));
+    	downloadImageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url);
     }
 }
