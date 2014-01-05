@@ -55,7 +55,6 @@ public class NoteView extends FrameLayout {
         
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         lock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "prezinotes");
-        lock.acquire();
         
         updateStepTask.execute();
     }
@@ -70,6 +69,7 @@ public class NoteView extends FrameLayout {
     }
 
     public void start() {
+        lock.acquire();
         mStarted = true;
         updateRunning();
     }
@@ -82,6 +82,7 @@ public class NoteView extends FrameLayout {
     		downloadImageTask.cancel(true);
     	}
         updateStepTask.cancel(true);
+        lock.release();
     }
 
     @Override
