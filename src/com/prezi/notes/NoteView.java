@@ -77,6 +77,11 @@ public class NoteView extends FrameLayout {
     public void stop() {
         mStarted = false;
         updateRunning();
+        
+        if (downloadImageTask != null) {
+    		downloadImageTask.cancel(true);
+    	}
+        updateStepTask.cancel(true);
     }
 
     @Override

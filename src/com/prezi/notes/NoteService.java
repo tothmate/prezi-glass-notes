@@ -53,6 +53,7 @@ public class NoteService extends Service {
                 mLiveCard.getSurfaceHolder().removeCallback(mCallback);
             }
             mLiveCard.unpublish();
+            mCallback.surfaceDestroyed(mLiveCard.getSurfaceHolder());
             mLiveCard = null;
         }
         super.onDestroy();

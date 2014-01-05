@@ -1,14 +1,10 @@
 package com.prezi.notes;
 
-import com.google.android.glass.view.WindowUtils;
 import com.prezi.notes.R;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;

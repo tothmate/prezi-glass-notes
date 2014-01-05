@@ -27,9 +27,13 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	            
 	            ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	            int next = in.read();
-	            while (next > -1) {
+	            while (next > -1 && !isCancelled()) {
 	                bos.write(next);
 	                next = in.read();
+	            }
+	            if (isCancelled()) {
+	            	in.close();
+	            	return null;
 	            }
 	            bos.flush();
 	            byteArray = bos.toByteArray();

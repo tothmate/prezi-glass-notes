@@ -19,8 +19,11 @@ public class UpdateStepTask extends AsyncTask<String, String, String> {
     		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     	
 	    	String received;
-	    	while ((received = in.readLine()) != null) {
+	    	while ((received = in.readLine()) != null && !isCancelled()) {
 	    	    publishProgress(received);
+	    	}
+	    	if (isCancelled()) {
+	    		socket.close();
 	    	}
     	} catch (Exception e) {
     		publishProgress("error");
@@ -37,6 +40,5 @@ public class UpdateStepTask extends AsyncTask<String, String, String> {
     }
 
     protected void onPostExecute(String result) {
-        
     }
 }
