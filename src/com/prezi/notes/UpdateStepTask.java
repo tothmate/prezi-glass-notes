@@ -30,8 +30,10 @@ public class UpdateStepTask extends AsyncTask<String, String, String> {
 
     protected void onProgressUpdate(String... progress) {
     	String[] splitted = progress[0].split("@@@");
-    	noteView.currentNote = splitted[0];
-    	noteView.setBackground(splitted[1]);
+    	if (splitted.length == 2) {
+    		noteView.currentNote = splitted[0];
+    		noteView.setBackground(splitted[1]);
+    	}
     }
 
     protected void onPostExecute(String result) {

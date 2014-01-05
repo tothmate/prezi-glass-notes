@@ -1,5 +1,6 @@
 package com.prezi.notes;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import android.graphics.Bitmap;
@@ -15,15 +16,29 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected Bitmap doInBackground(String... urls) {
-        String urldisplay = urls[0];
-        Bitmap mIcon11 = null;
+        String url = urls[0];
+        Bitmap img = null;
         try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
-            mIcon11 = BitmapFactory.decodeStream(in);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return mIcon11;
+        	byte[] byteArray;
+        	if (NoteView.imageCache.containsKey(url)) {
+        		byteArray = NoteView.imageCache.get(url);
+        	} else {
+	            InputStream in = new java.net.URL(url).openStream();
+	            
+	            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	            int next = in.read();
+	            while (next > -1) {
+	                bos.write(next);
+	                next = in.read();
+	            }
+	            bos.flush();
+	            byteArray = bos.toByteArray();
+	            NoteView.imageCache.put(url, byteArray);
+        	}
+            
+            img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        } catch (Exception e) {}
+        return img;
     }
 
     protected void onPostExecute(Bitmap result) {

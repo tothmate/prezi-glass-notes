@@ -1,10 +1,13 @@
 package com.prezi.notes;
 
 
+import java.util.HashMap;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
@@ -32,6 +35,10 @@ public class NoteView extends FrameLayout {
     private UpdateStepTask updateStepTask = new UpdateStepTask(this); 
     public String currentNote = "no path step yet";
     
+    private WakeLock lock;
+    
+    public static HashMap<String, byte[]> imageCache = new HashMap<String, byte[]>();
+    
     public NoteView(Context context) {
         this(context, null, 0); 
     }
@@ -47,9 +54,8 @@ public class NoteView extends FrameLayout {
         mNoteTextView = (TextView) findViewById(R.id.noteText);
         
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "prezinotes").acquire();
-        pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "prezinotes").acquire();
-        pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "prezinotes").acquire();
+        lock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "prezinotes");
+        lock.acquire();
         
         updateStepTask.execute();
     }
